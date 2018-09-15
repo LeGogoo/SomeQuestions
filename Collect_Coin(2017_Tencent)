@@ -1,0 +1,44 @@
+//2017年腾讯校招笔试题：
+/*
+ 小明很富有，有币值为2^n(n=0,1,2,3)的硬币各两个，即有两个1块钱的硬币，有两个2块钱的硬币，有两个四块钱的硬币。。。，
+ 现在输入一个正整数数m（0<m<10^18）,请问从小明的硬币中凑出这个数值，请问一共有多少中组合方式。
+ */
+ //F(i,j)为考虑前i个硬币,和为j的方案数量
+//F(i,j) = F(i-1,j)+F(i-1,j-2^(j-1)))+F(i-1,j-2*2^(j-1));
+//用记忆化搜索的思路好像能比动态规划效果好
+
+class Solution{
+private:
+    vector<vector<int>> memo;
+    int dfs(int index,int target){
+        if(target < 0)
+            return 0;
+        if(index == 0){
+            if(target == 0)
+                return 1;
+            else
+                return 0;
+        }
+        
+        if(memo[index][target] != -1)
+            return memo[index][target];
+        int res = 0;
+        int valIndex = pow(2, index - 1);
+        res = dfs(index - 1, target) + dfs(index - 1,target - valIndex) + dfs(index - 1,target - 2*valIndex);
+        memo[index][target] = res;
+        return res;
+    }
+public:
+    int count(int target){
+        int size = 0;
+        for(int j = 1; j <= target; j*=2)
+            size++;
+        memo = vector<vector<int>>(size+1,vector<int>(target + 1,-1));
+        return dfs(size,target);
+    }
+};
+int main(){
+    int n = 14;
+    cout << Solution().count(n);
+    return 1;
+}
